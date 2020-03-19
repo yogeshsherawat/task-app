@@ -4,8 +4,9 @@ var express = require("express"),
     mongoose                = require("mongoose"),
     passport                = require("passport"),
     LocalStrategy           = require("passport-local"),
-    User                    = require("./models/user");
+    User                    = require("./models/user"),
     passportLocalMongoose   = require("passport-local-mongoose");
+
 
 mongoose.connect("mongodb://localhost/task_app",{useNewUrlParser:true , useUnifiedTopology:true});
 app.use(bodyparser.urlencoded({extended:true}));
@@ -35,23 +36,35 @@ app.get("/",function(req,res)
 });
 
 app.get("/register",function(req,res){
-    res.render("register");
+    var chk=0;
+    res.render("register",{chk:chk});
 })
 app.post("/register",function(req,res){
-    User.register(new User({username:req.body.username}),req.body.password,function(err,user){
+    
+            User.register(new User({username:req.body.username}),req.body.password,function(err,user){
         if(err)
-        {
+        {   var chk=1;
             console.log(err);
-            return res.render('register');
+            if(err=='UserExistsError');
+            console.log("error is here");
+            return res.render("register",{chk:chk});
             
         }
         
+        
         passport.authenticate("local")(req,res,function(){
             res.redirect("/dashboard");
-        })
+        })    
+        
 
+    
+    }
+    );
+        
     });
-});
+    
+    
+
 
 
 app.get("/logout",function(req,res){
